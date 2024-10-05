@@ -1,0 +1,104 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "أدخل مفتاحاتبع التعليمات الموجودة على https://ims.gov.il/ar/ObservationDataAPI للحصول على مفتاح API",
+        "data": {
+          "api_token": "API Token"
+        }
+      },
+      "select_station": {
+        "description": "اختر محطة",
+        "data": {
+          "station": "محطة"
+        }
+      },
+      "select_station_conditions": {
+        "description": "حدد الشروط لتتبعها. يمكنك قراءة المزيد على https://ims.gov.il/ar/ObservationDataAPI",
+        "data": {
+          "station_conditions": "شروط"
+        }
+      }
+    },
+    "error": {
+      "auth": "رمز غير صالح",
+      "connection": "لا يمكن التواصل مع الخادم.",
+      "unknown": "خطأ غير معروف."
+    }
+  },
+  "entity": {
+    "weather": {
+      "ims_envista_weather": {
+        "name": "الطقس في محطة {station_name}"
+      }
+    },
+    "sensor": {
+      "station_name": {
+        "name": "اسم المحطة"
+      },
+      "last_updated": {
+        "name": "أخر تحديث"
+      },
+      "rain": {
+        "name": "كمية المطر"
+      },
+      "wsmax": {
+        "name": "سرعة الهبوب العُلوي"
+      },
+      "wdmax": {
+        "name": "إتجاه الهبوب العُلوي"
+      },
+      "ws": {
+        "name": "سرعة الريح"
+      },
+      "wd": {
+        "name": "إتجاه الريح"
+      },
+      "std_wd": {
+        "name": "الإنحراف المعياري لإتجاه الريح"
+      },
+      "td": {
+        "name": "درجة الحرارة الجافة"
+      },
+      "td_max": {
+        "name": "درجة الحرارة العُظمى"
+      },
+      "td_min": {
+        "name": "درجة الحرارة الصُغرى"
+      },
+      "tg": {
+        "name": "درجة الحرارة بمستوى سطح الأرض"
+      },
+      "rh": {
+        "name": "الرطوبة النسبية"
+      },
+      "ws_1mm": {
+        "name": "سرعة الريح العُظمى لدقيقة واحدة"
+      },
+      "ws_10mm": {
+        "name": "سرعة الريح العُظمى ل-10 دقائق"
+      },
+      "ws_max": {
+        "name": "سرعة الهبوب العُلوي"
+      },
+      "bp": {
+        "name": "الضغط في مستوى إرتفاع المحطة"
+      },
+      "diff": {
+        "name": "أشعة متبعثرة"
+      },
+      "grad": {
+        "name": "أشعة كُلية"
+      },
+      "nip": {
+        "name": "أشعة مُباشرة"
+      },
+      "time": {
+        "name": "زمن إنتهاء ال-10 دقائق العُظمى"
+      },
+      "rain_1_min": {
+        "name": "كمية المطر بدقيقة"
+      }
+    }
+  }
+}
