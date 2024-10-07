@@ -52,7 +52,7 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
             hass=hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(minutes=5),
+            update_interval=timedelta(minutes=10),
         )
 
     async def add_station(self, station_id: int) -> None:
