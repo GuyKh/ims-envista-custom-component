@@ -1,0 +1,104 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "עקוב אחרי ההנחיות ב-https://ims.gov.il/he/ObservationDataAPI לקבלת מפתח API",
+        "data": {
+          "api_token": "מפתח API"
+        }
+      },
+      "select_station": {
+        "description": "בחר תחנה",
+        "data": {
+          "station": "תחנה"
+        }
+      },
+      "select_station_conditions": {
+        "description": "בחר תנאים למעקב. תוכל לקרוא עוד ב https://ims.gov.il/he/ObservationDataAPI",
+        "data": {
+          "station_conditions": "תנאים"
+        }
+      }
+    },
+    "error": {
+      "auth": "מפתח לא תקין.",
+      "connection": "לא ניתן לתקשר עם השרת.",
+      "unknown": "שגיאה לא מוכרת."
+    }
+  },
+  "entity": {
+    "weather": {
+      "ims_envista_weather": {
+        "name": "מזג אוויר בתחנת {station_name}"
+      }
+    },
+    "sensor": {
+      "station_name": {
+        "name": "שם התחנה"
+      },
+      "last_updated": {
+        "name": "עדכון אחרון"
+      },
+      "rain": {
+        "name": "כמות גשם"
+      },
+      "wsmax": {
+        "name": "מהירות המשב העליון"
+      },
+      "wdmax": {
+        "name": "כיוון המשב העליון"
+      },
+      "ws": {
+        "name": "מהירות הרוח"
+      },
+      "wd": {
+        "name": "כיוון הרוח"
+      },
+      "std_wd": {
+        "name": "סטיית התקן של כיוון הרוח"
+      },
+      "td": {
+        "name": "טמפרטורה יבשה"
+      },
+      "td_max": {
+        "name": "טמפרטורת מקסימום"
+      },
+      "td_min": {
+        "name": "טמפרטורת מינימום"
+      },
+      "tg": {
+        "name": "טמפרטורה ליד הקרקע"
+      },
+      "rh": {
+        "name": "לחות יחסית"
+      },
+      "ws_1mm": {
+        "name": "מהירות רוח דקתית מקסימלית"
+      },
+      "ws_10mm": {
+        "name": "מהירות רוח 10 דקתית מקסימלית"
+      },
+      "ws_max": {
+        "name": "מהירות המשב העליון"
+      },
+      "bp": {
+        "name": "לחץ בגובה התחנה"
+      },
+      "diff": {
+        "name": "קרינה מפוזרת"
+      },
+      "grad": {
+        "name": "קרינה גלובלית"
+      },
+      "nip": {
+        "name": "קרינה ישירה"
+      },
+      "time": {
+        "name": "זמן סיום 10 הדקות המקסימליות"
+      },
+      "rain_1_min": {
+        "name": "גשם בדקה"
+      }
+    }
+  }
+}
