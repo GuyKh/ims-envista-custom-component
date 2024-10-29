@@ -26,6 +26,12 @@
       "unknown": "שגיאה לא מוכרת."
     }
   },
+  "services": {
+    "debug_get_coordinator_data": {
+      "name": "קבל מידע מקורדינטור של IMS Envista",
+      "description": "הדפס מידע לצורך ניפוי שגיאות."
+    }
+  },
   "entity": {
     "weather": {
       "ims_envista_weather": {
