@@ -15,7 +15,7 @@ from homeassistant.loader import async_get_loaded_integration
 
 from ims_envista import IMSEnvista
 
-from .const import CONF_STATION_CONDITIONS, CONF_STATION_ID
+from .const import CONF_STATION_CONDITIONS, CONF_STATION_ID, DOMAIN, LOGGER
 from .coordinator import ImsEnvistaUpdateCoordinator
 from .data import ImsEnvistaData
 
@@ -56,6 +56,17 @@ async def async_setup_entry(
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+
+    # Register the debug service
+    async def handle_debug_get_coordinator_data(call) -> None:  # noqa: ANN001 ARG001
+        # Log or return coordinator data
+        data = coordinator.data
+        LOGGER.info("Coordinator data: %s", data)
+        hass.bus.async_fire("custom_component_debug_event", {"data": data})
+
+    hass.services.async_register(
+        DOMAIN, "debug_get_coordinator_data", handle_debug_get_coordinator_data
+    )
 
     return True
 

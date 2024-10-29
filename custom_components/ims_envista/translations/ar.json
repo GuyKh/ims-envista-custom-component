@@ -26,6 +26,12 @@
       "unknown": "خطأ غير معروف."
     }
   },
+  "services": {
+    "debug_get_coordinator_data": {
+      "name": "الحصول على بيانات منسق IMS Envista",
+      "description": "طباعة البيانات لأغراض تصحيح الأخطاء."
+    }
+  },
   "entity": {
     "weather": {
       "ims_envista_weather": {
