@@ -1,5 +1,5 @@
 colorlog>=6.8.2
 homeassistant==2024.2.0
-ims-envista==0.1.12
+ims-envista==0.1.13
 pip>=21.3.1
 ruff>=0.6.9
