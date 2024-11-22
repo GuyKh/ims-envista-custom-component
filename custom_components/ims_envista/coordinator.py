@@ -97,12 +97,12 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
                 LOGGER.debug("Station %d latest data: %s", station, station_latest)
                 station_data[station][LATEST_KEY] = station_latest
 
-                station_daily = (
-                    await self.config_entry.runtime_data.client.get_daily_station_data(
-                        station
-                    )
-                )
-                station_data[station][DAILY_KEY] = station_daily.data
+                # station_daily = (
+                #     await self.config_entry.runtime_data.client.get_daily_station_data(
+                #         station
+                #     )
+                # )
+                # station_data[station][DAILY_KEY] = station_daily.data
 
         except ImsEnvistaApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
