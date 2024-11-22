@@ -10,7 +10,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from ims_envista import ImsEnvistaApiClientAuthenticationError, ImsEnvistaApiClientError
 
-from .const import DAILY_KEY, DOMAIN, LATEST_KEY, LOGGER
+from .const import DOMAIN, LATEST_KEY, LOGGER
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -97,12 +97,13 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
                 LOGGER.debug("Station %d latest data: %s", station, station_latest)
                 station_data[station][LATEST_KEY] = station_latest
 
-                station_daily = (
-                    await self.config_entry.runtime_data.client.get_daily_station_data(
-                        station
-                    )
-                )
-                station_data[station][DAILY_KEY] = station_daily.data
+                # station_daily = (
+                #     await self.config_entry.runtime_data.client.get_daily_station_data
+                #     (
+                #         station
+                #     )
+                # )
+                # station_data[station][DAILY_KEY] = station_daily.data
 
         except ImsEnvistaApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
