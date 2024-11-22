@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/GuyKh/ims-envista-custom-component/issues",
   "loggers": ["ims_envista"],
   "requirements": ["ims-envista==0.1.13"],
-  "version": "0.0.11"
+  "version": "0.0.12"
 }
