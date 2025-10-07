@@ -29,6 +29,6 @@ jobs:
           zip ims-envista.zip -r ./
 
       - name: "Upload the ZIP file to the release"
-        uses: "softprops/action-gh-release@v2.3.4"
+        uses: "softprops/action-gh-release@v2.4.0"
         with:
           files: ${{ github.workspace }}/custom_components/ims_envista/ims-envista.zip
