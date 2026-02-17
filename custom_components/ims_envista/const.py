@@ -6,6 +6,7 @@ LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "ims_envista"
 ATTRIBUTION = "Data provided by IMS Envista"
+SERVICE_DEBUG_GET_COORDINATOR_DATA = "debug_get_coordinator_data"
 
 CONF_STATION = "station"
 CONF_STATION_ID = "station_id"
@@ -28,7 +29,8 @@ RH_CHANNEL = "RH"
 TG_CHANNEL = "TG"
 RAD_AGRO_CHANNEL = "RadAgro"
 WS_1MM_CHANNEL = "WS1mm"
-WS_10MM_CHANNEL = "Ws10mm"
+WS_10MM_CHANNEL = "WS10mm"
+WS_10MM_LEGACY_CHANNEL = "Ws10mm"
 TIME_CHANNEL = "Time"
 TW_CHANNEL = "TW"
 BP_CHANNEL = "BP"

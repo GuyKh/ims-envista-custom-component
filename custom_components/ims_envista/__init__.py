@@ -1,9 +1,4 @@
-"""
-Custom integration to integrate integration_blueprint with Home Assistant.
-
-For more details about this integration, please refer to
-https://github.com/ludeeus/integration_blueprint
-"""
+"""The IMS Envista integration."""
 
 from __future__ import annotations
 
@@ -15,12 +10,18 @@ from homeassistant.loader import async_get_loaded_integration
 
 from ims_envista import IMSEnvista
 
-from .const import CONF_STATION_CONDITIONS, CONF_STATION_ID, DOMAIN, LOGGER
+from .const import (
+    CONF_STATION_CONDITIONS,
+    CONF_STATION_ID,
+    DOMAIN,
+    LOGGER,
+    SERVICE_DEBUG_GET_COORDINATOR_DATA,
+)
 from .coordinator import ImsEnvistaUpdateCoordinator
 from .data import ImsEnvistaData
 
 if TYPE_CHECKING:
-    from homeassistant.core import HomeAssistant
+    from homeassistant.core import HomeAssistant, ServiceCall
 
     from .data import ImsEnvistaConfigEntry
 
@@ -36,7 +37,7 @@ async def async_setup_entry(
     entry: ImsEnvistaConfigEntry,
 ) -> bool:
     """Set up this integration using UI."""
-    coordinator = ImsEnvistaUpdateCoordinator(hass=hass)
+    coordinator = ImsEnvistaUpdateCoordinator(hass=hass, config_entry=entry)
 
     entry.runtime_data = ImsEnvistaData(
         client=IMSEnvista(
@@ -48,6 +49,7 @@ async def async_setup_entry(
         station_id=entry.data[CONF_STATION_ID],
         conditions=entry.data[CONF_STATION_CONDITIONS],
     )
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = entry.runtime_data
 
     await coordinator.add_station(entry.data[CONF_STATION_ID])
 
@@ -57,16 +59,23 @@ async def async_setup_entry(
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
-    # Register the debug service
-    async def handle_debug_get_coordinator_data(call) -> None:  # noqa: ANN001 ARG001
-        # Log or return coordinator data
-        data = coordinator.data
-        LOGGER.info("Coordinator data: %s", data)
-        hass.bus.async_fire("custom_component_debug_event", {"data": data})
+    if not hass.services.has_service(DOMAIN, SERVICE_DEBUG_GET_COORDINATOR_DATA):
 
-    hass.services.async_register(
-        DOMAIN, "debug_get_coordinator_data", handle_debug_get_coordinator_data
-    )
+        async def handle_debug_get_coordinator_data(call: ServiceCall) -> None:  # noqa: ARG001
+            """Log coordinator data for all loaded IMS Envista entries."""
+            data = {
+                config_entry.entry_id: config_entry.runtime_data.coordinator.data
+                for config_entry in hass.config_entries.async_entries(DOMAIN)
+                if config_entry.runtime_data is not None
+            }
+            LOGGER.info("Coordinator data: %s", data)
+            hass.bus.async_fire("custom_component_debug_event", {"data": data})
+
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_DEBUG_GET_COORDINATOR_DATA,
+            handle_debug_get_coordinator_data,
+        )
 
     return True
 
@@ -76,7 +85,14 @@ async def async_unload_entry(
     entry: ImsEnvistaConfigEntry,
 ) -> bool:
     """Handle removal of an entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok:
+        hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
+        if not hass.config_entries.async_entries(DOMAIN) and hass.services.has_service(
+            DOMAIN, SERVICE_DEBUG_GET_COORDINATOR_DATA
+        ):
+            hass.services.async_remove(DOMAIN, SERVICE_DEBUG_GET_COORDINATOR_DATA)
+    return unload_ok
 
 
 async def async_reload_entry(

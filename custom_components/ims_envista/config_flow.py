@@ -1,4 +1,4 @@
-"""Adds config flow for Blueprint."""
+"""Adds config flow for IMS Envista."""
 
 from __future__ import annotations
 
@@ -27,6 +27,8 @@ from .const import (
     LAST_UPDATED_CHANNEL,
     LOGGER,
     STATION_NAME_CHANNEL,
+    WS_10MM_CHANNEL,
+    WS_10MM_LEGACY_CHANNEL,
 )
 
 if TYPE_CHECKING:
@@ -35,7 +37,6 @@ if TYPE_CHECKING:
     from ims_envista.station_data import StationInfo
 
 MIN_DISTANCE_TO_STATION_FOR_AUTOSELECT = 10
-OBSERVATION_API_DOCS_URL = "https://ims.gov.il/en/ObservationDataAPI"
 
 
 def _find_closest_station(
@@ -80,10 +81,11 @@ def _find_closest_station(
     return closest_station
 
 
-class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Blueprint."""
+class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for IMS Envista."""
 
     VERSION = 1
+    _docs_url = "https://ims.gov.il/en/ObservationDataAPI"
 
     def __init__(self) -> None:
         """Instantiate a config flow."""
@@ -125,6 +127,21 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 LOGGER.exception(exception)
                 _errors["base"] = "unknown"
             else:
+                if not stations:
+                    _errors["base"] = "no_stations"
+                    return self.async_show_form(
+                        step_id="user",
+                        data_schema=vol.Schema(
+                            {
+                                vol.Required(CONF_API_TOKEN): selector.TextSelector(
+                                    selector.TextSelectorConfig(
+                                        type=selector.TextSelectorType.TEXT,
+                                    ),
+                                ),
+                            },
+                        ),
+                        errors=_errors,
+                    )
                 self._token = token
                 self._stations = stations
                 return await self.async_step_select_station()
@@ -140,7 +157,7 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ),
                 },
             ),
-            description_placeholders={"docs_url": OBSERVATION_API_DOCS_URL},
+            description_placeholders={"docs_url": self._docs_url},
             errors=_errors,
         )
 
@@ -149,6 +166,9 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: dict | None = None,
     ) -> data_entry_flow.FlowResult:
         """Handle the seconds step of the configure flow - selecting a station."""
+        if self._stations is None:
+            return self.async_abort(reason="unknown")
+
         _errors = {}
         if user_input is not None and user_input[CONF_STATION]:
             selected_station = next(
@@ -157,12 +177,14 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
                 None,
             )
-            LOGGER.debug("Selected Station is: %s", selected_station.name)
             if selected_station:
+                LOGGER.debug("Selected Station is: %s", selected_station.name)
                 self._selected_station = selected_station
                 return await self.async_step_select_station_conditions()
             _errors["base"] = "unknown"
         active_stations = [station for station in self._stations if station.active]
+        if not active_stations:
+            return self.async_abort(reason="no_stations")
 
         # Step 2: Calculate the closest station based on Home Assistant's coordinates
         ha_latitude = self.hass.config.latitude
@@ -193,15 +215,23 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: dict | None = None,
     ) -> data_entry_flow.FlowResult:
         """Handle the configure flow - selecting station's properties."""
+        if self._selected_station is None:
+            return self.async_abort(reason="unknown")
+
         _errors = {}
-        if user_input is not None and user_input[CONF_STATION_CONDITIONS]:
-            selected_conditions = user_input[CONF_STATION_CONDITIONS]
+        if user_input is not None and CONF_STATION_CONDITIONS in user_input:
+            selected_conditions = [
+                WS_10MM_CHANNEL if condition == WS_10MM_LEGACY_CHANNEL else condition
+                for condition in user_input[CONF_STATION_CONDITIONS]
+            ]
             LOGGER.debug("Selected Monitored Conditions: %s", selected_conditions)
             data = {
                 CONF_API_TOKEN: self._token,
                 CONF_STATION_ID: self._selected_station.station_id,
                 CONF_STATION_CONDITIONS: selected_conditions,
             }
+            await self.async_set_unique_id(str(self._selected_station.station_id))
+            self._abort_if_unique_id_configured()
 
             return self.async_create_entry(
                 title="IMS Envista - " + self._selected_station.name,
@@ -229,6 +259,6 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ): cv.multi_select(monitor_options),
                 },
             ),
-            description_placeholders={"docs_url": OBSERVATION_API_DOCS_URL},
+            description_placeholders={"docs_url": self._docs_url},
             errors=_errors,
         )

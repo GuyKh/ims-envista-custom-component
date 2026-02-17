@@ -24,6 +24,9 @@ class ImsEnvistaEntity(CoordinatorEntity[ImsEnvistaUpdateCoordinator]):
         """Initialize."""
         super().__init__(coordinator)
         station = coordinator.get_station_info(station_id)
+        if station is None:
+            msg = f"Station {station_id} is not loaded in coordinator"
+            raise ValueError(msg)
 
         self._station_id = station_id
         self._condition_name = condition_name

@@ -19,7 +19,7 @@ type ImsEnvistaConfigEntry = ConfigEntry[ImsEnvistaData]
 
 @dataclass
 class ImsEnvistaData:
-    """Data for the Blueprint integration."""
+    """Runtime data for the IMS Envista integration."""
 
     client: IMSEnvista
     coordinator: ImsEnvistaUpdateCoordinator
