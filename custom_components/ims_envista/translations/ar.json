@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "description": "أدخل مفتاحاتبع التعليمات الموجودة على https://ims.gov.il/ar/ObservationDataAPI للحصول على مفتاح API",
+        "description": "أدخل مفتاحاتبع التعليمات الموجودة على {docs_url} للحصول على مفتاح API",
         "data": {
           "api_token": "API Token"
         }
@@ -14,7 +14,7 @@
         }
       },
       "select_station_conditions": {
-        "description": "حدد الشروط لتتبعها. يمكنك قراءة المزيد على https://ims.gov.il/ar/ObservationDataAPI",
+        "description": "حدد الشروط لتتبعها. يمكنك قراءة المزيد على {docs_url}",
         "data": {
           "station_conditions": "شروط"
         }

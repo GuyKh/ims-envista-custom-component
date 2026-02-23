@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "description": "עקוב אחרי ההנחיות ב-https://ims.gov.il/he/ObservationDataAPI לקבלת מפתח API",
+        "description": "עקוב אחרי ההנחיות ב-{docs_url} לקבלת מפתח API",
         "data": {
           "api_token": "מפתח API"
         }
@@ -14,7 +14,7 @@
         }
       },
       "select_station_conditions": {
-        "description": "בחר תנאים למעקב. תוכל לקרוא עוד ב https://ims.gov.il/he/ObservationDataAPI",
+        "description": "בחר תנאים למעקב. תוכל לקרוא עוד ב {docs_url}",
         "data": {
           "station_conditions": "תנאים"
         }
