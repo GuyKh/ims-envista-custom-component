@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from ims_envista.station_data import StationInfo
 
 MIN_DISTANCE_TO_STATION_FOR_AUTOSELECT = 10
+OBSERVATION_API_DOCS_URL = "https://ims.gov.il/en/ObservationDataAPI"
 
 
 def _find_closest_station(
@@ -139,6 +140,7 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ),
                 },
             ),
+            description_placeholders={"docs_url": OBSERVATION_API_DOCS_URL},
             errors=_errors,
         )
 
@@ -227,5 +229,6 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ): cv.multi_select(monitor_options),
                 },
             ),
+            description_placeholders={"docs_url": OBSERVATION_API_DOCS_URL},
             errors=_errors,
         )

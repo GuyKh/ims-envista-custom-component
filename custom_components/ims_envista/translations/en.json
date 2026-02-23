@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "Follow the instructions at https://ims.gov.il/en/ObservationDataAPI to obtain an API key",
+                "description": "Follow the instructions at {docs_url} to obtain an API key",
                 "data": {
                     "api_token": "API Token"
                 }
@@ -14,7 +14,7 @@
                 }
             },
             "select_station_conditions": {
-                "description": "Select monitoring station's conditions. You can read more at https://ims.gov.il/en/ObservationDataAPI",
+                "description": "Select monitoring station's conditions. You can read more at {docs_url}",
                 "data": {
                     "station_conditions": "Conditions"
                 }
