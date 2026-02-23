@@ -248,11 +248,12 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="Time",
         icon="mdi:timer-settings",
-        value_fn=lambda data: datetime.combine(
-            data[LATEST_KEY].datetime, data[LATEST_KEY].time
-        )
-        if data[LATEST_KEY].time is not None and data[LATEST_KEY].datetime is not None
-        else None,
+        value_fn=lambda data: (
+            datetime.combine(data[LATEST_KEY].datetime, data[LATEST_KEY].time)
+            if data[LATEST_KEY].time is not None
+            and data[LATEST_KEY].datetime is not None
+            else None
+        ),
     ),
     RAIN_1_MIN_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="rain_1_min",
