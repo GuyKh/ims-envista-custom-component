@@ -13,6 +13,7 @@ from ims_envista import ImsEnvistaApiClientAuthenticationError, ImsEnvistaApiCli
 from .const import DOMAIN, LATEST_KEY, LOGGER
 
 if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
 
     from ims_envista.station_data import StationInfo
@@ -43,7 +44,7 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(exception) from exception
         return True
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
         self._stations = []
         self._stations_static_data = {}
@@ -51,6 +52,7 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
         super().__init__(
             hass=hass,
             logger=LOGGER,
+            config_entry=config_entry,
             name=DOMAIN,
             update_interval=timedelta(minutes=10),
         )
@@ -72,7 +74,7 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
         else:
             LOGGER.error("Station %s does not exist in the coordinator", station_id)
 
-    def get_station_info(self, station_id: int) -> StationInfo:
+    def get_station_info(self, station_id: int) -> StationInfo | None:
         """Get station info by station id."""
         station_info = self._stations_static_data.get(station_id)
         if not station_info:

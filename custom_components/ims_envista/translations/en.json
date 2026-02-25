@@ -23,12 +23,16 @@
         "error": {
             "auth": "Invalid Token.",
             "connection": "Unable to connect to the server.",
+            "no_stations": "No stations are available for this API token.",
             "unknown": "Unknown error occurred."
+        },
+        "abort": {
+            "no_stations": "No active stations are available for this API token."
         }
     },
     "services": {
         "debug_get_coordinator_data": {
-            "name": "Get IMS Envista Energy Coordinator Data",
+            "name": "Get IMS Envista Coordinator Data",
             "description": "Fetch and return the coordinator data for debugging purposes."
         }
     },
@@ -104,6 +108,9 @@
             },
             "rain_1_min": {
                 "name": "Rain downfall in 1min"
+            },
+            "tw": {
+                "name": "Wet Temperature"
             }
         }
     }

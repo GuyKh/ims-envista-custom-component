@@ -45,6 +45,7 @@ from .const import (
     WDMAX_CHANNEL,
     WS_1MM_CHANNEL,
     WS_10MM_CHANNEL,
+    WS_10MM_LEGACY_CHANNEL,
     WS_CHANNEL,
     WSMAX_CHANNEL,
 )
@@ -206,6 +207,15 @@ ENTITY_DESCRIPTIONS = {
         icon="mdi:weather-windy",
         value_fn=lambda data: data[LATEST_KEY].ws_10mm,
     ),
+    WS_10MM_LEGACY_CHANNEL: ImsEnvistaSensorEntityDescription(
+        key="ws_10mm",
+        device_class=SensorDeviceClass.WIND_SPEED,
+        native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
+        suggested_display_precision=1,
+        name="WS 10mm",
+        icon="mdi:weather-windy",
+        value_fn=lambda data: data[LATEST_KEY].ws_10mm,
+    ),
     BP_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="bp",
         device_class=SensorDeviceClass.PRESSURE,
@@ -265,7 +275,7 @@ ENTITY_DESCRIPTIONS = {
         value_fn=lambda data: data[LATEST_KEY].rain_1_min,
     ),
     TW_CHANNEL: ImsEnvistaSensorEntityDescription(
-        key="td",
+        key="tw",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         suggested_display_precision=1,
