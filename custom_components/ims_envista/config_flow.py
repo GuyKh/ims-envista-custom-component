@@ -140,6 +140,7 @@ class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                                 ),
                             },
                         ),
+                        description_placeholders={"docs_url": self._docs_url},
                         errors=_errors,
                     )
                 self._token = token

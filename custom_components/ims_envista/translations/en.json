@@ -32,7 +32,7 @@
     },
     "services": {
         "debug_get_coordinator_data": {
-            "name": "Get IMS Envista Energy Coordinator Data",
+            "name": "Get IMS Envista Coordinator Data",
             "description": "Fetch and return the coordinator data for debugging purposes."
         }
     },
