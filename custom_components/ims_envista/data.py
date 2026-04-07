@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
 
-    from ims_envista import IMSEnvista
+    from ims_envista import IMSEnvista  # type: ignore[attr-defined]
 
     from .coordinator import ImsEnvistaUpdateCoordinator
 
@@ -21,7 +21,7 @@ type ImsEnvistaConfigEntry = ConfigEntry[ImsEnvistaData]
 class ImsEnvistaData:
     """Data for the Blueprint integration."""
 
-    client: IMSEnvista
+    client: IMSEnvista  # type: ignore[name-defined]
     coordinator: ImsEnvistaUpdateCoordinator
     integration: Integration
     station_id: int

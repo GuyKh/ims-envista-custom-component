@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant import config_entries, data_entry_flow
+from homeassistant import config_entries
 from homeassistant.const import CONF_API_TOKEN
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
-from ims_envista import (
+from ims_envista import (  # type: ignore[attr-defined]
     IMSEnvista,
     ImsEnvistaApiClientAuthenticationError,
     ImsEnvistaApiClientCommunicationError,
@@ -31,6 +31,8 @@ from .const import (
 
 if TYPE_CHECKING:
     from uuid import UUID
+
+    from homeassistant.config_entries import ConfigFlowResult
 
     from ims_envista.station_data import StationInfo
 
@@ -72,11 +74,12 @@ def _find_closest_station(
             MIN_DISTANCE_TO_STATION_FOR_AUTOSELECT,
         )
         return stations[0] if len(stations) > 0 else None
-    LOGGER.debug(
-        "Closest station is: %s - %s km",
-        closest_station.name,
-        round(closest_distance, 2),
-    )
+    if closest_station:
+        LOGGER.debug(
+            "Closest station is: %s - %s km",
+            closest_station.name,
+            round(closest_distance, 2),
+        )
     return closest_station
 
 
@@ -102,10 +105,10 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self,
-        user_input: dict | None = None,
-    ) -> data_entry_flow.FlowResult:
+        user_input: dict[str, str] | None = None,
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
-        _errors = {}
+        _errors: dict[str, str] = {}
         if user_input is not None:
             token = user_input[CONF_API_TOKEN]
             try:
@@ -146,22 +149,34 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_select_station(
         self,
-        user_input: dict | None = None,
-    ) -> data_entry_flow.FlowResult:
+        user_input: dict[str, int] | None = None,
+    ) -> ConfigFlowResult:
         """Handle the seconds step of the configure flow - selecting a station."""
-        _errors = {}
+        _errors: dict[str, str] = {}
         if user_input is not None and user_input[CONF_STATION]:
-            selected_station = next(
-                filter(
-                    lambda st: st.station_id == user_input[CONF_STATION], self._stations
-                ),
-                None,
-            )
-            LOGGER.debug("Selected Station is: %s", selected_station.name)
-            if selected_station:
-                self._selected_station = selected_station
-                return await self.async_step_select_station_conditions()
+            selected_station_id = user_input[CONF_STATION]
+            if self._stations:
+                selected_station = next(
+                    (
+                        st
+                        for st in self._stations
+                        if st.station_id == selected_station_id
+                    ),
+                    None,
+                )
+                if selected_station:
+                    LOGGER.debug("Selected Station is: %s", selected_station.name)
+                    self._selected_station = selected_station
+                    return await self.async_step_select_station_conditions()
             _errors["base"] = "unknown"
+
+        if not self._stations:
+            _errors["base"] = "no_stations"
+            return self.async_show_form(
+                step_id="select_station",
+                errors=_errors,
+            )
+
         active_stations = [station for station in self._stations if station.active]
 
         # Step 2: Calculate the closest station based on Home Assistant's coordinates
@@ -176,13 +191,14 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             station.station_id: station.name for station in active_stations
         }
 
+        default_station = closest_station.station_id if closest_station else None
         return self.async_show_form(
             step_id="select_station",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
-                        CONF_STATION, default=closest_station.station_id
-                    ): vol.In(station_options),
+                    vol.Required(CONF_STATION, default=default_station): vol.In(
+                        station_options
+                    ),
                 },
             ),
             errors=_errors,
@@ -190,22 +206,31 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_select_station_conditions(
         self,
-        user_input: dict | None = None,
-    ) -> data_entry_flow.FlowResult:
+        user_input: dict[str, list[str]] | None = None,
+    ) -> ConfigFlowResult:
         """Handle the configure flow - selecting station's properties."""
-        _errors = {}
+        _errors: dict[str, str] = {}
         if user_input is not None and user_input[CONF_STATION_CONDITIONS]:
             selected_conditions = user_input[CONF_STATION_CONDITIONS]
             LOGGER.debug("Selected Monitored Conditions: %s", selected_conditions)
-            data = {
-                CONF_API_TOKEN: self._token,
-                CONF_STATION_ID: self._selected_station.station_id,
-                CONF_STATION_CONDITIONS: selected_conditions,
-            }
+            if self._selected_station and self._token:
+                data = {
+                    CONF_API_TOKEN: self._token,
+                    CONF_STATION_ID: self._selected_station.station_id,
+                    CONF_STATION_CONDITIONS: selected_conditions,
+                }
 
-            return self.async_create_entry(
-                title="IMS Envista - " + self._selected_station.name,
-                data=data,
+                return self.async_create_entry(
+                    title="IMS Envista - " + self._selected_station.name,
+                    data=data,
+                )
+            _errors["base"] = "unknown"
+
+        if not self._selected_station:
+            _errors["base"] = "no_station_selected"
+            return self.async_show_form(
+                step_id="select_station_conditions",
+                errors=_errors,
             )
 
         LOGGER.debug("All Monitored Conditions: %s", self._selected_station.monitors)

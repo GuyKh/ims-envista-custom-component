@@ -8,7 +8,10 @@ from typing import TYPE_CHECKING, Any
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from ims_envista import ImsEnvistaApiClientAuthenticationError, ImsEnvistaApiClientError
+from ims_envista import (  # type: ignore[attr-defined]
+    ImsEnvistaApiClientAuthenticationError,
+    ImsEnvistaApiClientError,
+)
 
 from .const import DOMAIN, LATEST_KEY, LOGGER
 
@@ -25,6 +28,8 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     config_entry: ImsEnvistaConfigEntry
+    _stations: list[int]
+    _stations_static_data: dict[int, StationInfo]
 
     async def _verify_station(self, station_id: int) -> bool:
         """Verify station exists."""
@@ -72,7 +77,7 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
         else:
             LOGGER.error("Station %s does not exist in the coordinator", station_id)
 
-    def get_station_info(self, station_id: int) -> StationInfo:
+    def get_station_info(self, station_id: int) -> StationInfo | None:
         """Get station info by station id."""
         station_info = self._stations_static_data.get(station_id)
         if not station_info:
@@ -81,7 +86,7 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> Any:
         """Update data via library."""
-        station_data = {}
+        station_data: dict[int, dict[str, Any]] = {}
         try:
             for station in self._stations:
                 LOGGER.debug("Updating Station %d", station)

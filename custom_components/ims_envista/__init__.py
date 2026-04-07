@@ -13,7 +13,7 @@ from homeassistant.const import CONF_API_TOKEN, Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
-from ims_envista import IMSEnvista
+from ims_envista import IMSEnvista  # type: ignore[attr-defined]
 
 from .const import CONF_STATION_CONDITIONS, CONF_STATION_ID, DOMAIN, LOGGER
 from .coordinator import ImsEnvistaUpdateCoordinator

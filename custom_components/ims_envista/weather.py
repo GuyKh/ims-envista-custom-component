@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.components.weather import (
     ATTR_CONDITION_CLEAR_NIGHT,
@@ -78,11 +78,14 @@ class IMSEnvistaWeather(WeatherEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        super()._handle_coordinator_update()
+        self.async_write_ha_state()
 
-    def _get_latest_data(self, key: str):  # noqa: ANN202
+    def _get_latest_data(self, key: str) -> float | int | None:
         """Get Coordinator Latest Data."""
-        station_data = self._coordinator.data.get(self._station_id)
+        if not self._coordinator.data:
+            return None
+        data = cast("dict[int, dict[str, Any]]", self._coordinator.data)
+        station_data = data.get(self._station_id)
         if not station_data:
             return None
         latest_station_data = station_data.get(LATEST_KEY)
