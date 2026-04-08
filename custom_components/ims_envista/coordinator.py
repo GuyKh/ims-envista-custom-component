@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from ims_envista.station_data import StationInfo
 
-    from .data import ImsEnvistaConfigEntry
+    from .data import ImsEnvistaConfigEntry, ImsEnvistaData
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
@@ -35,9 +35,10 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
             )
             return False
         try:
-            station_info = await self.config_entry.runtime_data.client.get_station_info(
-                station_id
+            entry_data = cast(
+                "ImsEnvistaData", self.hass.data[DOMAIN][self.config_entry.entry_id]
             )
+            station_info = await entry_data.client.get_station_info(station_id)
             self._stations_static_data[station_id] = station_info
         except ImsEnvistaApiClientError as exception:
             LOGGER.error("Error getting station info: %s", exception)
@@ -46,16 +47,16 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
 
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialize."""
-        self._stations = []
-        self._stations_static_data = {}
+        self._stations: list[int] = []
+        self._stations_static_data: dict[int, StationInfo] = {}
 
         super().__init__(
             hass=hass,
             logger=LOGGER,
-            config_entry=config_entry,
             name=DOMAIN,
             update_interval=timedelta(minutes=10),
         )
+        self.config_entry = config_entry
 
     async def add_station(self, station_id: int) -> None:
         """Add station."""
@@ -81,18 +82,19 @@ class ImsEnvistaUpdateCoordinator(DataUpdateCoordinator):
             LOGGER.error("Missing station %s data in coordinator", station_id)
         return station_info
 
-    async def _async_update_data(self) -> Any:
+    async def _async_update_data(self) -> dict[int, dict[str, Any]]:
         """Update data via library."""
-        station_data = {}
+        station_data: dict[int, dict[str, Any]] = {}
         try:
             for station in self._stations:
                 LOGGER.debug("Updating Station %d", station)
                 station_data[station] = station_data.get(station, {})
 
-                station_latest_res = (
-                    await self.config_entry.runtime_data.client.get_latest_station_data(
-                        station
-                    )
+                entry_data = cast(
+                    "ImsEnvistaData", self.hass.data[DOMAIN][self.config_entry.entry_id]
+                )
+                station_latest_res = await entry_data.client.get_latest_station_data(
+                    station
                 )
 
                 station_latest = station_latest_res.data[0]

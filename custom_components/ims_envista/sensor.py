@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -24,6 +24,7 @@ from homeassistant.const import (
 from .const import (
     BP_CHANNEL,
     DIFF_R_CHANNEL,
+    DOMAIN,
     GRAD_CHANNEL,
     LAST_UPDATED_CHANNEL,
     LATEST_KEY,
@@ -60,16 +61,20 @@ if TYPE_CHECKING:
     from ims_envista.station_data import StationInfo
 
     from .coordinator import ImsEnvistaUpdateCoordinator
-    from .data import ImsEnvistaConfigEntry
+    from .data import ImsEnvistaConfigEntry, ImsEnvistaData
 
 
 @dataclass(frozen=True, kw_only=True)
 class ImsEnvistaEntityDescriptionMixin:
     """Mixin values for required keys."""
 
-    value_fn: Callable[[dict | tuple | StationInfo], str | float | datetime] | None = (
-        None
-    )
+    value_fn: (
+        Callable[
+            [dict[str, Any] | tuple[Any, ...] | StationInfo],
+            str | float | datetime | None,
+        ]
+        | None
+    ) = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -84,14 +89,14 @@ ENTITY_DESCRIPTIONS = {
         key="station_name",
         name="Station Name",
         icon="mdi:home-city",
-        value_fn=lambda station_info: station_info.name.title(),
+        value_fn=lambda station_info: cast("StationInfo", station_info).name.title(),
     ),
     LAST_UPDATED_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="last_updated",
         device_class=SensorDeviceClass.TIMESTAMP,
         name="Last Update Time",
         icon="mdi:sun-clock",
-        value_fn=lambda data: data[LATEST_KEY].datetime,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].datetime,
     ),
     RAIN_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="rain",
@@ -100,7 +105,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="Rain",
         icon="mdi:weather-pouring",
-        value_fn=lambda data: data[LATEST_KEY].rain,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].rain,
     ),
     WSMAX_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="wsmax",
@@ -109,7 +114,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="WS Max",
         icon="mdi:weather-windy",
-        value_fn=lambda data: data[LATEST_KEY].ws_max,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].ws_max,
     ),
     WDMAX_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="wdmax",
@@ -117,7 +122,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=0,
         name="WD Max",
         icon="mdi:compass",
-        value_fn=lambda data: data[LATEST_KEY].wd_max,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].wd_max,
     ),
     WS_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="ws",
@@ -126,7 +131,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="WS",
         icon="mdi:weather-windy",
-        value_fn=lambda data: data[LATEST_KEY].ws,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].ws,
     ),
     WD_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="wd",
@@ -134,7 +139,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=0,
         name="WD",
         icon="mdi:compass",
-        value_fn=lambda data: data[LATEST_KEY].wd,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].wd,
     ),
     STDWD_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="std_wd",
@@ -142,7 +147,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="Std WD",
         icon="mdi:compass",
-        value_fn=lambda data: data[LATEST_KEY].std_wd,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].std_wd,
     ),
     TD_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="td",
@@ -151,7 +156,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="TD",
         icon="mdi:thermometer",
-        value_fn=lambda data: data[LATEST_KEY].td,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].td,
     ),
     TDMAX_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="td_max",
@@ -160,7 +165,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="TD max",
         icon="mdi:thermometer-chevron-up",
-        value_fn=lambda data: data[LATEST_KEY].td_max,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].td_max,
     ),
     TDMIN_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="td_min",
@@ -169,7 +174,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="TD Min",
         icon="mdi:thermometer-chevron-down",
-        value_fn=lambda data: data[LATEST_KEY].td_min,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].td_min,
     ),
     RH_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="rh",
@@ -178,7 +183,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=0,
         name="RH",
         icon="mdi:cloud-percent",
-        value_fn=lambda data: data[LATEST_KEY].rh,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].rh,
     ),
     TG_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="tg",
@@ -187,7 +192,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="TG",
         icon="mdi:thermometer",
-        value_fn=lambda data: data[LATEST_KEY].tg,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].tg,
     ),
     WS_1MM_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="ws_1mm",
@@ -196,7 +201,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="WS 1mm",
         icon="mdi:weather-windy",
-        value_fn=lambda data: data[LATEST_KEY].ws_1mm,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].ws_1mm,
     ),
     WS_10MM_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="ws_10mm",
@@ -205,7 +210,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="WS 10mm",
         icon="mdi:weather-windy",
-        value_fn=lambda data: data[LATEST_KEY].ws_10mm,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].ws_10mm,
     ),
     WS_10MM_LEGACY_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="ws_10mm",
@@ -214,7 +219,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="WS 10mm",
         icon="mdi:weather-windy",
-        value_fn=lambda data: data[LATEST_KEY].ws_10mm,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].ws_10mm,
     ),
     BP_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="bp",
@@ -223,7 +228,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="BP",
         icon="mdi:car-brake-low-pressure",
-        value_fn=lambda data: data[LATEST_KEY].bp,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].bp,
     ),
     DIFF_R_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="diff",
@@ -232,7 +237,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="DiffR",
         icon="mdi:radioactive",
-        value_fn=lambda data: data[LATEST_KEY].diff_r,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].diff_r,
     ),
     GRAD_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="grad",
@@ -241,7 +246,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="Grad",
         icon="mdi:radioactive-circle-outline",
-        value_fn=lambda data: data[LATEST_KEY].grad,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].grad,
     ),
     NIP_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="nip",
@@ -250,7 +255,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="NIP",
         icon="mdi:radioactive-circle",
-        value_fn=lambda data: data[LATEST_KEY].nip,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].nip,
     ),
     TIME_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="time",
@@ -259,9 +264,12 @@ ENTITY_DESCRIPTIONS = {
         name="Time",
         icon="mdi:timer-settings",
         value_fn=lambda data: (
-            datetime.combine(data[LATEST_KEY].datetime, data[LATEST_KEY].time)
-            if data[LATEST_KEY].time is not None
-            and data[LATEST_KEY].datetime is not None
+            datetime.combine(
+                cast("dict[str, Any]", data)[LATEST_KEY].datetime,
+                cast("dict[str, Any]", data)[LATEST_KEY].time,
+            )
+            if cast("dict[str, Any]", data)[LATEST_KEY].time is not None
+            and cast("dict[str, Any]", data)[LATEST_KEY].datetime is not None
             else None
         ),
     ),
@@ -272,7 +280,7 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="Rain 1 Min",
         icon="mdi:water",
-        value_fn=lambda data: data[LATEST_KEY].rain_1_min,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].rain_1_min,
     ),
     TW_CHANNEL: ImsEnvistaSensorEntityDescription(
         key="tw",
@@ -281,27 +289,30 @@ ENTITY_DESCRIPTIONS = {
         suggested_display_precision=1,
         name="TW",
         icon="mdi:thermometer",
-        value_fn=lambda data: data[LATEST_KEY].tw,
+        value_fn=lambda data: cast("dict[str, Any]", data)[LATEST_KEY].tw,
     ),
 }
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,  # noqa: ARG001 function argument: `hass`
+    hass: HomeAssistant,
     entry: ImsEnvistaConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
-    coordinator = entry.runtime_data.coordinator
-    station_id = entry.runtime_data.station_id
-    conditions = entry.runtime_data.conditions
+    entry_data = cast("ImsEnvistaData", hass.data[DOMAIN][entry.entry_id])
+    coordinator = entry_data.coordinator
+    station_id = entry_data.station_id
+    conditions = entry_data.conditions
 
     async_add_entities(
         ImsEnvistaSensor(
             coordinator=coordinator,
             station_id=station_id,
             condition_name=condition,
-            entity_description=ENTITY_DESCRIPTIONS.get(condition),
+            entity_description=cast(
+                "ImsEnvistaSensorEntityDescription", ENTITY_DESCRIPTIONS.get(condition)
+            ),
         )
         for condition in conditions
         if ENTITY_DESCRIPTIONS.get(condition)
@@ -317,6 +328,8 @@ async def async_setup_entry(
 class ImsEnvistaSensor(ImsEnvistaEntity, SensorEntity):
     """ims_envista Sensor class."""
 
+    entity_description: ImsEnvistaSensorEntityDescription
+
     def __init__(
         self,
         coordinator: ImsEnvistaUpdateCoordinator,
@@ -331,14 +344,17 @@ class ImsEnvistaSensor(ImsEnvistaEntity, SensorEntity):
         self._attr_translation_key = f"{entity_description.key}"
 
     @property
-    def native_value(self) -> str | None:
+    def native_value(self) -> str | float | datetime | None:
         """Return the native value of the sensor."""
+        value_fn = self.entity_description.value_fn
+        if value_fn is None:
+            return None
         if self._condition_name in STATIC_DATA_CHANNELS:
-            return self.entity_description.value_fn(
-                self.coordinator.get_station_info(self._station_id)
-            )
+            station_info = self.coordinator.get_station_info(self._station_id)
+            if station_info is not None:
+                return value_fn(station_info)
         if self.coordinator.data is not None:
-            return self.entity_description.value_fn(
-                self.coordinator.data.get(self._station_id)
-            )
+            station_data = self.coordinator.data.get(self._station_id)
+            if station_data is not None:
+                return value_fn(station_data)
         return None

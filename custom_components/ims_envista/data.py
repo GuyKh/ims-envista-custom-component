@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .coordinator import ImsEnvistaUpdateCoordinator
 
 
-type ImsEnvistaConfigEntry = ConfigEntry[ImsEnvistaData]
+type ImsEnvistaConfigEntry = ConfigEntry
 
 
 @dataclass
