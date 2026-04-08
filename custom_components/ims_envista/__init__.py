@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from homeassistant.const import CONF_API_TOKEN, Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -39,7 +39,7 @@ async def async_setup_entry(
     """Set up this integration using UI."""
     coordinator = ImsEnvistaUpdateCoordinator(hass=hass, config_entry=entry)
 
-    entry.runtime_data = ImsEnvistaData(
+    entry_data = ImsEnvistaData(
         client=IMSEnvista(
             token=entry.data[CONF_API_TOKEN],
             session=async_get_clientsession(hass),
@@ -49,7 +49,7 @@ async def async_setup_entry(
         station_id=entry.data[CONF_STATION_ID],
         conditions=entry.data[CONF_STATION_CONDITIONS],
     )
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = entry.runtime_data
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = entry_data
 
     await coordinator.add_station(entry.data[CONF_STATION_ID])
 
@@ -64,9 +64,11 @@ async def async_setup_entry(
         async def handle_debug_get_coordinator_data(call: ServiceCall) -> None:  # noqa: ARG001
             """Log coordinator data for all loaded IMS Envista entries."""
             data = {
-                config_entry.entry_id: config_entry.runtime_data.coordinator.data
+                config_entry.entry_id: cast(
+                    "ImsEnvistaData", hass.data[DOMAIN][config_entry.entry_id]
+                ).coordinator.data
                 for config_entry in hass.config_entries.async_entries(DOMAIN)
-                if config_entry.runtime_data is not None
+                if config_entry.entry_id in hass.data.get(DOMAIN, {})
             }
             LOGGER.info("Coordinator data: %s", data)
             hass.bus.async_fire("custom_component_debug_event", {"data": data})

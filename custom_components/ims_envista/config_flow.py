@@ -75,13 +75,13 @@ def _find_closest_station(
         return stations[0] if len(stations) > 0 else None
     LOGGER.debug(
         "Closest station is: %s - %s km",
-        closest_station.name,
+        closest_station.name if closest_station else "None",
         round(closest_distance, 2),
     )
     return closest_station
 
 
-class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Config flow for IMS Envista."""
 
     VERSION = 1
@@ -107,7 +107,7 @@ class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: dict | None = None,
     ) -> data_entry_flow.FlowResult:
         """Handle a flow initialized by the user."""
-        _errors = {}
+        _errors: dict[str, str] = {}
         if user_input is not None:
             token = user_input[CONF_API_TOKEN]
             try:
@@ -170,7 +170,7 @@ class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self._stations is None:
             return self.async_abort(reason="unknown")
 
-        _errors = {}
+        _errors: dict[str, str] = {}
         if user_input is not None and user_input[CONF_STATION]:
             selected_station = next(
                 filter(
@@ -178,7 +178,7 @@ class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
                 None,
             )
-            if selected_station:
+            if selected_station is not None:
                 LOGGER.debug("Selected Station is: %s", selected_station.name)
                 self._selected_station = selected_station
                 return await self.async_step_select_station_conditions()
@@ -204,7 +204,8 @@ class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Required(
-                        CONF_STATION, default=closest_station.station_id
+                        CONF_STATION,
+                        default=closest_station.station_id if closest_station else None,
                     ): vol.In(station_options),
                 },
             ),
@@ -219,7 +220,7 @@ class ImsEnvistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self._selected_station is None:
             return self.async_abort(reason="unknown")
 
-        _errors = {}
+        _errors: dict[str, str] = {}
         if user_input is not None and CONF_STATION_CONDITIONS in user_input:
             selected_conditions = [
                 WS_10MM_CHANNEL if condition == WS_10MM_LEGACY_CHANNEL else condition

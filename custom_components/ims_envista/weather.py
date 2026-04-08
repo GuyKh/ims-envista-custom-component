@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from homeassistant.components.weather import (
     ATTR_CONDITION_CLEAR_NIGHT,
@@ -20,26 +20,29 @@ from homeassistant.const import (
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
+    DOMAIN,
     LATEST_KEY,
 )
 from .coordinator import ImsEnvistaUpdateCoordinator
 
 if TYPE_CHECKING:
-    from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
     from homeassistant.helpers.typing import DiscoveryInfoType
 
+    from .data import ImsEnvistaConfigEntry, ImsEnvistaData
+
 
 async def async_setup_entry(
-    hass: HomeAssistant,  # noqa: ARG001
-    config_entry: ConfigEntry,
+    hass: HomeAssistant,
+    config_entry: ImsEnvistaConfigEntry,
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,  # noqa: ARG001
 ) -> None:
     """Set up IMS Weather entity based on a config entry."""
-    coordinator = config_entry.runtime_data.coordinator
-    station_id = config_entry.runtime_data.station_id
+    entry_data = cast("ImsEnvistaData", hass.data[DOMAIN][config_entry.entry_id])
+    coordinator = entry_data.coordinator
+    station_id = entry_data.station_id
     station = coordinator.get_station_info(station_id)
     station_name = station.name.title() if station is not None else str(station_id)
 
