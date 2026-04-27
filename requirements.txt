@@ -2,5 +2,5 @@ colorlog>=6.10.1
 homeassistant==2024.2.0
 ims-envista==0.1.14
 mypy==1.20.2
-pip>=21.3.1
+pip>=26.1
 ruff>=0.15.12
