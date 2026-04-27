@@ -3,4 +3,4 @@ homeassistant==2024.2.0
 ims-envista==0.1.14
 mypy==1.20.2
 pip>=21.3.1
-ruff>=0.15.1
+ruff>=0.15.12
