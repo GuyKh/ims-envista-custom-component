@@ -1,4 +1,8 @@
-"""BlueprintEntity class."""
+"""
+Copyright (c) 2024-2026  Guy Khmelnitsky.
+
+BlueprintEntity class.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +14,7 @@ from .coordinator import ImsEnvistaUpdateCoordinator
 
 
 class ImsEnvistaEntity(CoordinatorEntity[ImsEnvistaUpdateCoordinator]):
-    """BlueprintEntity class."""
+    """ImsEnvistaEntity class."""
 
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True

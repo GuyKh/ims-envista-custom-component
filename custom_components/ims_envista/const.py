@@ -1,4 +1,8 @@
-"""Constants for ims_envista."""
+"""
+Copyright (c) 2024-2026  Guy Khmelnitsky.
+
+Constants for ims_envista.
+"""
 
 from logging import Logger, getLogger
 
