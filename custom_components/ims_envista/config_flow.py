@@ -1,4 +1,8 @@
-"""Adds config flow for IMS Envista."""
+"""
+Copyright (c) 2024-2026  Guy Khmelnitsky.
+
+Adds config flow for IMS Envista.
+"""
 
 from __future__ import annotations
 

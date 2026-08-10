@@ -1,4 +1,8 @@
-"""Weather component for IMS Envista."""
+"""
+Copyright (c) 2024-2026  Guy Khmelnitsky.
+
+Weather component for IMS Envista.
+"""
 
 from __future__ import annotations
 

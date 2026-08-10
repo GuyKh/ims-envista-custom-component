@@ -1,4 +1,8 @@
-"""DataUpdateCoordinator for ims_envista."""
+"""
+Copyright (c) 2024-2026  Guy Khmelnitsky.
+
+DataUpdateCoordinator for ims_envista.
+"""
 
 from __future__ import annotations
 
